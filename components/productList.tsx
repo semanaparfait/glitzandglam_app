@@ -9,7 +9,7 @@ const { width } = Dimensions.get('window');
 export default function ProductList() {
   const router = useRouter();
   const { data: products, isLoading, error } = useProducts();
-
+  const token = localStorage.getItem('token');
   if (isLoading) {
     return <Text className="text-center mt-4">Loading products...</Text>;
   }
@@ -17,6 +17,7 @@ export default function ProductList() {
   if (error) {
     return <Text className="text-center mt-4 text-red-500">Error loading products</Text>;
   }
+  
 
   return (
     <View className="mt-8">
@@ -38,9 +39,9 @@ export default function ProductList() {
               <Link href={`/product/${product.id}`} asChild>
                 <TouchableOpacity
                   activeOpacity={0.9}
-                  className="bg-white rounded-xl shadow-md   overflow-hidden"
+                  className=" rounded-xl  overflow-hidden"
                 >
-                  <View className="relative w-full h-48 bg-slate-50">
+                  <View className="relative w-full h-48 ">
                     <Image
                       source={{ uri: product.images?.[0] }}
                       className="w-full h-full"
@@ -48,6 +49,7 @@ export default function ProductList() {
                     />
 
                     {/* Favorite Heart */}
+                    {token && (
                     <TouchableOpacity
                       className="absolute top-3 right-3 z-10 p-2 bg-white/90 rounded-full shadow-md"
                       onPress={(e) => e.stopPropagation()}
@@ -58,6 +60,7 @@ export default function ProductList() {
                         color={isLiked ? '#ef4444' : '#64748b'}
                       />
                     </TouchableOpacity>
+                    )}
                   </View>
 
                   {/* Product Info */}

@@ -15,7 +15,7 @@ export default function CategoryList() {
   }
 
   return (
-<View>
+<View className='px-2'>
   <Text className="font-bold py-4 text-base">Categories</Text>
 <ScrollView
   horizontal
