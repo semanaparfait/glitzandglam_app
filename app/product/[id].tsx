@@ -1,3 +1,4 @@
+import { useCart, useCartItems } from "@/hooks/cart/useCart";
 import { useProducts } from "@/hooks/useProducts";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -11,30 +12,43 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 const { width } = Dimensions.get("window");
+
 export default function ProductDetails() {
+  // All hooks must be called before any return
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const [isLiked, setIsLiked] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | undefined>(
     undefined,
   );
+  const [quantity, setQuantity] = useState(1);
   const { data: products, isLoading, isError } = useProducts();
+  const { mutateAsync: addToCart } = useCart();
+  const { data: cartItems } = useCartItems();
+
   if (isLoading) {
     return <Text>loading product details</Text>;
   }
   if (isError) {
     return <Text>Failed to load product details</Text>;
   }
-  const [isLiked, setIsLiked] = useState(false);
+  useEffect(() => {
+    if (products && id) {
+      const foundProduct = products.find(
+        (product: { id: string }) => product.id === id,
+      );
+      if (foundProduct?.images?.length) {
+        setSelectedImage(foundProduct.images[0]);
+      }
+    }
+  }, [products, id]);
+
   const product = products?.find(
     (product: { id: string }) => product.id === id,
   );
-  useEffect(() => {
-    if (product?.images?.length) {
-      setSelectedImage(product.images[0]);
-    }
-  }, [products]);
   if (!product) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center">
@@ -45,8 +59,37 @@ export default function ProductDetails() {
       </SafeAreaView>
     );
   }
+  const handleAddToCart = async () => {
+    if (!products) return;
 
-  const itemsCount = 6
+    try {
+      await addToCart({
+        productId: product.id,
+        quantity: quantity,
+      });
+
+      Toast.show({
+        type: "success",
+        text1: "Added to cart",
+        text2: `${product.name} has been added to your cart.`,
+      });
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Failed to add to cart",
+        text2: `${product.name} could not be added to your cart.`,
+      });
+    }
+  };
+  const itemsCount =
+    cartItems?.items?.reduce(
+      (total: number, item: any) => total + item.quantity,
+      0,
+    ) || 0;
+
+  const isInCart = cartItems?.items?.some(
+    (item: any) => String(item.product?.id).trim() === String(product.id).trim()
+  );
   return (
     <View className="flex-1 bg-white">
       {/* product images */}
@@ -120,12 +163,12 @@ export default function ProductDetails() {
         </View>
         {/* product details */}
         <View className="px-4 pb-8">
-        <View>
-          <Text className=" text-[#D9534F] mb-2 font-bold text-[11px] uppercase tracking-widest">
-            <Ionicons name='flash' size={18} />
-           ONLY {product.stockQuantity} ITEMS IN STOCK
-          </Text>
-        </View>
+          <View>
+            <Text className=" text-[#D9534F] mb-2 font-bold text-[11px] uppercase tracking-widest">
+              <Ionicons name="flash" size={18} />
+              ONLY {product.stockQuantity} ITEMS IN STOCK
+            </Text>
+          </View>
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-2xl font-bold mb-0 flex-1" numberOfLines={2}>
               {product.name}
@@ -137,7 +180,7 @@ export default function ProductDetails() {
           </View>
           <View className="flex-row items-baseline mb-2 gap-5">
             <Text className="text-2xl font-bold text-[#907764] mb-2">
-             {product.price.toLocaleString('rw-RW')} RWF
+              {product.price.toLocaleString("rw-RW")} RWF
             </Text>
             {product?.oldPrice && (
               <Text className="text-base line-through text-gray-400">
@@ -145,7 +188,7 @@ export default function ProductDetails() {
               </Text>
             )}
           </View>
-          <View >
+          <View>
             <Text className="font-bold pb-3">Description</Text>
             <Text className="text-base text-gray-700 leading-relaxed">
               {product.description}
@@ -155,16 +198,29 @@ export default function ProductDetails() {
       </ScrollView>
       {/* footer */}
       <View className="absolute bottom-0 left-0 flex-row right-0 p-4 bg-white border-t border-gray-100">
-        <TouchableOpacity className="w-4/5 bg-primary py-4 rounded-full items-center shadow-lg flex-row justify-center">
-            <Ionicons name="bag-outline" size={20} color="white"/>
-            <Text className='text-white font-bold text-base ml-2'>Add to Cart</Text>
-        </TouchableOpacity>
-
-            <TouchableOpacity className="w-1/5 py-3 flex-row justify-center relative">
-            <Ionicons name="cart-outline" size={24} />
-            <View className="absolute top-1 right-3 size-4  z-10 bg-primary rounded-full justify-center items-center">
-            <Text className='text-white text-[9px]'>{itemsCount}</Text>
-            </View>
+        {isInCart ? (
+          <View className="w-4/5 bg-gray-300 py-4 rounded-full items-center shadow-lg flex-row justify-center opacity-70">
+            <Ionicons name="checkmark-done-outline" size={20} color="white" />
+            <Text className="text-white font-bold text-base ml-2">
+              Already in Cart
+            </Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={handleAddToCart}
+            className="w-4/5 bg-primary py-4 rounded-full items-center shadow-lg flex-row justify-center"
+          >
+            <Ionicons name="bag-outline" size={20} color="white" />
+            <Text className="text-white font-bold text-base ml-2">
+              Add to Cart
+            </Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity className="w-1/5 py-3 flex-row justify-center relative">
+          <Ionicons name="cart-outline" size={24} />
+          <View className="absolute top-1 right-3 size-4  z-10 bg-primary rounded-full justify-center items-center">
+            <Text className="text-white text-[9px]">{itemsCount}</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
