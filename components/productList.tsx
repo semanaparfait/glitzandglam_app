@@ -9,7 +9,7 @@ const { width } = Dimensions.get('window');
 export default function ProductList() {
   const router = useRouter();
   const { data: products, isLoading, error } = useProducts();
-  const token = localStorage.getItem('token');
+  const token = false
   if (isLoading) {
     return <Text className="text-center mt-4">Loading products...</Text>;
   }
@@ -43,7 +43,7 @@ export default function ProductList() {
                 >
                   <View className="relative w-full h-48 ">
                     <Image
-                      source={{ uri: product.images?.[0] }}
+                      source={{ uri: product.images?.[0].replace("http://", "https://") }}
                       className="w-full h-full"
                       resizeMode="cover"
                     />

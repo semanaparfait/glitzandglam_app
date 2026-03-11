@@ -103,7 +103,7 @@ export default function Shop() {
                activeOpacity={0.9}>
                 <View className="relative w-full h-48">
                   <Image
-                    source={{ uri: item.images?.[0] }}
+                    source={{ uri: item.images?.[0].replace("http://", "https://") }}
                     className="w-full h-full"
                     resizeMode="cover"
                   />
