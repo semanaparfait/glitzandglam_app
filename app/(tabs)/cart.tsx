@@ -7,7 +7,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
@@ -32,10 +32,19 @@ export default function Cart() {
   const subtotalFormatted = formatCurrency(subtotal);
 
   const handleRemove = (itemId: string) => {
-    removeFromCart(itemId);
-    Toast.show({
-      type: "success",
-      text1: "Item removed from cart",
+   removeFromCart(itemId, {
+     onSuccess: () => {
+       Toast.show({
+         type: "success",
+         text1: "Item removed from cart",
+       });
+     },
+     onError: () => {
+       Toast.show({
+         type: "error",
+         text1: "Failed to remove item",
+       });
+     },
     });
   };
   const increaseQuantity = (item: any) => {
@@ -50,6 +59,29 @@ export default function Cart() {
       updateCartItemQuantity({ itemId: item.id, quantity: newQuantity });
     }
   };
+   if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
+        <Header title="My Cart" showBackButton />
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
+        <Header title="My Cart" showBackButton />
+        <View className="flex-1 justify-center items-center">
+          <Text>Failed to load cart. Please try again.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+   
 
   return (
     <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>

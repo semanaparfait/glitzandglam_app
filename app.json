@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.glits_and_glam"
+      "package": "com.umwirabura.glits_and_glam"
     },
     "web": {
       "output": "static",
