@@ -28,7 +28,7 @@ export default function CategoryList() {
       className="mr-4 items-center"
     >
       <Image
-        source={{ uri: category.image }}
+        source={{ uri: category.image?.replace("http://", "https://") }}
         className="w-16 h-16 rounded-full mb-2"
       />
 

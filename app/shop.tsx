@@ -139,6 +139,13 @@ export default function Shop() {
               </View>
             ) : null
           }
+          ListEmptyComponent={
+            !loading && (
+              <View className="flex-1 items-center justify-center py-20">
+                <Text>No products found</Text>
+              </View>
+            )
+          }
         />
       )}
     </SafeAreaView>
