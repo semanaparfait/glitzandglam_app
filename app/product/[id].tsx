@@ -18,13 +18,13 @@ const { width } = Dimensions.get("window");
 
 export default function ProductDetails() {
   // All hooks must be called before any return
+  const [quantity, setQuantity] = useState(1);
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const [isLiked, setIsLiked] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | undefined>(
     undefined,
   );
-  const [quantity, setQuantity] = useState(1);
   const { data: products, isLoading, isError } = useProducts();
   const { mutateAsync: addToCart } = useCart();
   const { data: cartItems } = useCartItems();
@@ -105,7 +105,7 @@ export default function ProductDetails() {
               style={{ width: width * 0.95, height: 400 }}
             >
               <Image
-                source={{ uri: selectedImage }}
+                source={{ uri: selectedImage?.replace("http://", "https://") }}
                 style={{ width: width * 0.95, height: 400 }}
                 resizeMode="cover"
               />
@@ -135,7 +135,7 @@ export default function ProductDetails() {
                   activeOpacity={0.7}
                 >
                   <Image
-                    source={{ uri: img }}
+                    source={{ uri: img.replace("http://", "https://") }}
                     className="w-full h-full rounded-xl"
                     resizeMode="cover"
                   />
@@ -217,7 +217,7 @@ export default function ProductDetails() {
             </Text>
           </TouchableOpacity>
         )}
-        <TouchableOpacity className="w-1/5 py-3 flex-row justify-center relative">
+        <TouchableOpacity onPress={() => router.push('/cart')} className="w-1/5 py-3 flex-row justify-center relative">
           <Ionicons name="cart-outline" size={24} />
           <View className="absolute top-1 right-3 size-4  z-10 bg-primary rounded-full justify-center items-center">
             <Text className="text-white text-[9px]">{itemsCount}</Text>
