@@ -1,6 +1,6 @@
 import { View, Text, Image, TouchableOpacity, Dimensions } from 'react-native';
 import React from 'react';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '@/hooks/products/useProducts';
 import { Link, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -9,7 +9,7 @@ const { width } = Dimensions.get('window');
 export default function ProductList() {
   const router = useRouter();
   const { data: products, isLoading, error } = useProducts();
-  const token = localStorage.getItem('token');
+  const token = false
   if (isLoading) {
     return <Text className="text-center mt-4">Loading products...</Text>;
   }
@@ -31,7 +31,7 @@ export default function ProductList() {
 
       {/* Product Grid */}
       <View className="flex-row flex-wrap justify-between px-1">
-        {products.slice(0, 4).map((product: any) => {
+        {(products ?? []).slice(0, 4).map((product: any) => {
           const isLiked = product.isLiked || false; 
 
           return (
@@ -43,7 +43,7 @@ export default function ProductList() {
                 >
                   <View className="relative w-full h-48 ">
                     <Image
-                      source={{ uri: product.images?.[0] }}
+                      source={{ uri: product.images?.[0].replace("http://", "https://") }}
                       className="w-full h-full"
                       resizeMode="cover"
                     />
@@ -72,14 +72,15 @@ export default function ProductList() {
                       {product.name}
                     </Text>
                     <View className='flex-row items-center gap-4 mt-2'>
-                    <Text className="  font-bold text-slate-900">
-                      {product.price} RWF
+                  <Text className="  font-bold text-slate-900">
+                    {product.price} RWF
+                  </Text>
+                  {product?.oldPrice && (
+                    <Text className="line-through text-gray-200">
+                      {product.oldPrice}
                     </Text>
-                        <Text className="  line-through text-gray-200">
-                      {product?.oldPrice} 
-                    </Text>
-
-                    </View>
+                  )}
+                </View>
                   </View>
                 </TouchableOpacity>
               </Link>

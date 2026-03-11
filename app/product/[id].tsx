@@ -1,5 +1,5 @@
 import { useCart, useCartItems } from "@/hooks/cart/useCart";
-import { useProducts } from "@/hooks/useProducts";
+import { useProducts } from "@/hooks/products/useProducts";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -88,7 +88,8 @@ export default function ProductDetails() {
     ) || 0;
 
   const isInCart = cartItems?.items?.some(
-    (item: any) => String(item.product?.id).trim() === String(product.id).trim()
+    (item: any) =>
+      String(item.product?.id).trim() === String(product.id).trim(),
   );
   return (
     <View className="flex-1 bg-white">
