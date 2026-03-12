@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {  useRouter } from "expo-router";
 export default function Profile() {
   const router = useRouter()
-  const user = true;
+  const user = false;
   const PROFILE_MENU = [
     { id: 1, title: "My Order", icon: "book", route: "/orders" },
     { id: 2, title: "Shipping Addreses", icon: "location", route: "address" },
@@ -47,7 +47,9 @@ export default function Profile() {
             </View>
             <Text className="text-center py-3">OR</Text>
             <View>
-              <TouchableOpacity className="bg-primary rounded-full py-3">
+              <TouchableOpacity
+              onPress={()=>{router.push("/account")}}
+               className="bg-primary rounded-full py-3">
                 <Text className="font-semibold text-white text-center">
                   Sign Up
                 </Text>
