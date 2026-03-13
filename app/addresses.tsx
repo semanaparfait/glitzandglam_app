@@ -203,7 +203,7 @@ export default function Addresses() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-surafce" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
       <Header title="Shipping Addresses" showBackButton />
       <ScrollView className="px-4 mt-4 flex-1">
         <Text className="text-gray-500 mb-4">No addresses found</Text>
@@ -221,6 +221,25 @@ export default function Addresses() {
             <Text className="text-lg font-bold text-gray-900 mb-4">
               New Shipping Address
             </Text>
+            {!isLoggedIn && (
+              <View>
+                <Text className="mb-2">Names</Text>
+                <TextInput
+                  placeholder="full names.."
+                  className="mb-4 border rounded-xl border-gray-300 bg-white px-4 py-3 text-gray-900"
+                />
+                <Text className="mb-2">Email</Text>
+                <TextInput
+                  placeholder="example@gmail.com.."
+                  className="mb-4 border rounded-xl border-gray-300 bg-white px-4 py-3 text-gray-900"
+                />
+                <Text className="mb-2">Phone Number</Text>
+                <TextInput
+                  placeholder="+25078XXXXXXX"
+                  className="mb-4 border rounded-xl border-gray-300 bg-white px-4 py-3 text-gray-900"
+                />
+              </View>
+            )}
 
             <SelectField
               fieldKey="province"
@@ -303,7 +322,7 @@ export default function Addresses() {
               value={additionalDetails}
               onChangeText={setAdditionalDetails}
               multiline
-              numberOfLines={3}
+              numberOfLines={5}
               className="mb-4 border rounded-xl border-gray-300 bg-white px-4 py-3 text-gray-900"
               placeholder="any addional note"
             />
@@ -324,6 +343,9 @@ export default function Addresses() {
                 </Text>
               </TouchableOpacity>
             )}
+            <TouchableOpacity className="bg-primary items-center py-3 rounded-full">
+              <Text className="font-semibold text-base">Continue</Text>
+              </TouchableOpacity>
           </View>
         )}
       </ScrollView>
