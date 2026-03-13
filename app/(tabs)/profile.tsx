@@ -17,8 +17,6 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await logout();
-
-      // Remove cached profile data immediately so stale user info is never rendered.
       queryClient.setQueryData(["userProfile"], null);
       await queryClient.removeQueries({ queryKey: ["userProfile"] });
 
@@ -93,14 +91,29 @@ export default function Profile() {
         ) : (
           <>
             <View className="flex-col items-center justify-center gap-3 mt-10 w-full">
-              <View className="items-center ">
-                <Image
-                  source={{
-                    uri: currentUser.profile,
-                  }}
-                  resizeMode="contain"
-                  style={{ width: 100, height: 100, borderRadius: 50 }}
-                />
+          <View className="items-center">
+                {currentUser.profile ? (
+                  <Image
+                    source={{ uri: currentUser.profile }}
+                    resizeMode="contain"
+                    style={{ width: 100, height: 100, borderRadius: 50 }}
+                  />
+                ) : (
+                  <View
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 50,
+                      backgroundColor: '#907764',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{ fontSize: 40, color: '#fff' }}>
+                      {currentUser.email.charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
               </View>
               <Text className="font-bold text-2xl ">
                 {currentUser.fullName}
