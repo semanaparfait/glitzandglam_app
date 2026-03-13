@@ -188,9 +188,9 @@ export default function Cart() {
       ) : (
         <View className="flex-1 justify-center items-center bg-white px-10">
           <View className="w-24 h-24 bg-gray-50 rounded-full items-center justify-center mb-8">
-            <Ionicons name="bag" size={42} color="#1f2937" strokeWidth={1.2} />
+            <Ionicons name="bag" size={42} color="#907764" strokeWidth={1.2} />
           </View>
-          <Text className="text-2xl font-serif text-gray-900 tracking-tight">
+          <Text className="text-2xl font-serif text- tracking-tight">
             Your Bag is Empty
           </Text>
           <Text className="text-center text-gray-500 mt-3 leading-6 font-light">
@@ -199,7 +199,7 @@ export default function Cart() {
           </Text>
           <TouchableOpacity
             onPress={() => router.push("/shop")}
-            className="mt-12 bg-gray-900 px-12 py-4 shadow-sm"
+            className="mt-12 bg-primary px-12 py-4 shadow-sm"
             activeOpacity={0.8}
           >
             <Text className="text-white font-medium uppercase tracking-widest text-xs">

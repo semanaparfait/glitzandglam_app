@@ -68,13 +68,13 @@ export default function Shop() {
           <Ionicons name="search" size={20} color="black" className=" ml-4" />
           <TextInput
             placeholder="Search products..."
-            className="flex-1 ml-2  px-4 py-3"
+            className="flex-1 ml-2 text-black  px-4 py-3"
             returnKeyType="search"
           />
         </View>
         {/* for filter button */}
-        <TouchableOpacity className="bg-gray-800 w-12 h-12 items-center justify-center rounded-xl ">
-          <Ionicons name="options-outline" size={24} color="black" />
+        <TouchableOpacity className="bg-primary  w-12 h-12 items-center justify-center rounded-xl ">
+          <Ionicons name="options-outline" size={24} color="white" />
         </TouchableOpacity>
       </View>
       {/* Loading and error states */}
@@ -96,7 +96,7 @@ export default function Shop() {
           renderItem={({ item }) => (
             <View
               key={item.id}
-              className="w-[48%] mb-4 bg-white rounded-xl overflow-hidden shadow"
+              className="w-[48%] mb-4 bg-white rounded-md overflow-hidden "
             >
               <Link href={`/product/${item.id}`} asChild>
               <TouchableOpacity
