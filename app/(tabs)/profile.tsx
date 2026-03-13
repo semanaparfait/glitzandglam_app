@@ -1,23 +1,49 @@
 import Header from "@/components/header";
+import { useLogoutUser } from "@/hooks/auth/useAuth";
+import { useGetUserProfile } from "@/hooks/user/useUser";
 import { Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {  useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
 export default function Profile() {
-  const router = useRouter()
-  const user = false;
+  const router = useRouter();
+  const { data: currentUser } = useGetUserProfile();
+  const { mutateAsync: logout } = useLogoutUser();
+  const queryClient = useQueryClient();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+
+      // Remove cached profile data immediately so stale user info is never rendered.
+      queryClient.setQueryData(["userProfile"], null);
+      await queryClient.removeQueries({ queryKey: ["userProfile"] });
+
+      Toast.show({ type: "success", text1: "Logged out successfully" });
+      router.replace("/");
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: "Logout failed",
+        text2: error?.message || "Please try again",
+      });
+    }
+  };
+  // console.log("User Profile:", currentUser);
   const PROFILE_MENU = [
     { id: 1, title: "My Order", icon: "book", route: "/orders" },
     { id: 2, title: "Shipping Addreses", icon: "location", route: "address" },
-    { id: 3, title: "My review", icon: "star", route:"/reviews" },
-    { id: 4, title: "Settings", icon: "settings", route:"/settings"},
+    { id: 3, title: "My review", icon: "star", route: "/reviews" },
+    { id: 4, title: "Settings", icon: "settings", route: "/settings" },
   ];
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       <Header title="Profile" showBackButton />
       <ScrollView className="px-4">
-        {!user ? (
+        {!currentUser ? (
           <>
             <View className="flex-col items-center justify-center gap-3 ">
               <View className="items-center ">
@@ -48,8 +74,11 @@ export default function Profile() {
             <Text className="text-center py-3">OR</Text>
             <View>
               <TouchableOpacity
-              onPress={()=>{router.push("/account")}}
-               className="bg-primary rounded-full py-3">
+                onPress={() => {
+                  router.push("/account");
+                }}
+                className="bg-primary rounded-full py-3"
+              >
                 <Text className="font-semibold text-white text-center">
                   Sign Up
                 </Text>
@@ -67,18 +96,22 @@ export default function Profile() {
               <View className="items-center ">
                 <Image
                   source={{
-                    uri: "https://i.pinimg.com/736x/43/0c/65/430c65921825de18b5c89836f6bea0d0.jpg",
+                    uri: currentUser.profile,
                   }}
                   resizeMode="contain"
                   style={{ width: 100, height: 100, borderRadius: 50 }}
                 />
               </View>
-              <Text className="font-bold text-2xl ">John Doe</Text>
-              <Text className="text-gray-500 mb-3">john.doe@example.com</Text>
+              <Text className="font-bold text-2xl ">
+                {currentUser.fullName}
+              </Text>
+              <Text className="text-gray-500 mb-3">
+                {currentUser.email} | {currentUser.phoneNumber}
+              </Text>
               <View className="bg-white rounded-xl  p-2 mb-4 w-full">
                 {PROFILE_MENU.map((item) => (
                   <TouchableOpacity
-                  onPress={()=>router.push(item.route as any)}
+                    onPress={() => router.push(item.route as any)}
                     key={item.id}
                     className=" py-3 px-4 border-b border-gray-300  flex-row items-center justify-between gap-2 "
                   >
@@ -94,7 +127,10 @@ export default function Profile() {
                   </TouchableOpacity>
                 ))}
               </View>
-              <TouchableOpacity className="bg-red-500 rounded-full py-3 w-full">
+              <TouchableOpacity
+                onPress={handleLogout}
+                className="bg-red-500 rounded-full py-3 w-full"
+              >
                 <Text className="font-semibold text-white text-center">
                   Logout
                 </Text>

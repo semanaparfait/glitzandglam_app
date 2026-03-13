@@ -30,17 +30,39 @@ const getTokenFromResponse = (payload: any): string | null => {
   if (!payload || typeof payload !== "object") return null;
 
   const directToken =
-    payload.accessToken || payload.token || payload.jwt || payload.idToken;
+    payload.accessToken ||
+    payload.access_token ||
+    payload.token ||
+    payload.jwt ||
+    payload.idToken;
   if (typeof directToken === "string" && directToken.length > 0) {
     return directToken;
   }
 
   const nestedToken =
     payload.data?.accessToken ||
+    payload.data?.access_token ||
     payload.data?.token ||
     payload.data?.jwt ||
     payload.data?.idToken;
 
+  if (typeof nestedToken === "string" && nestedToken.length > 0) {
+    return nestedToken;
+  }
+
+  return null;
+};
+
+const getRefreshTokenFromResponse = (payload: any): string | null => {
+  if (!payload || typeof payload !== "object") return null;
+
+  const directToken =
+    payload.refreshToken || payload.refresh_token || payload.data?.refreshToken;
+  if (typeof directToken === "string" && directToken.length > 0) {
+    return directToken;
+  }
+
+  const nestedToken = payload.data?.refresh_token;
   if (typeof nestedToken === "string" && nestedToken.length > 0) {
     return nestedToken;
   }
@@ -58,8 +80,9 @@ export default function Account() {
   const [showPassword, setShowPassword] = useState(false);
   const theme = useTheme();
   const router = useRouter();
-const { mutateAsync: loginUser, isPending: loginLoading } = useLoginUser();
-const { mutateAsync: registerUser, isPending: registerLoading } = useRegisterUser();
+  const { mutateAsync: loginUser, isPending: loginLoading } = useLoginUser();
+  const { mutateAsync: registerUser, isPending: registerLoading } =
+    useRegisterUser();
 
   const title = useMemo(() => {
     if (action === "signup") return "Create your account";
@@ -119,11 +142,16 @@ const { mutateAsync: registerUser, isPending: registerLoading } = useRegisterUse
     try {
       const loginResponse = await loginUser({ email, password });
       setEmail("");
-        setPassword("");
+      setPassword("");
       const token = getTokenFromResponse(loginResponse);
+      const refreshToken = getRefreshTokenFromResponse(loginResponse);
 
       if (token) {
         await AsyncStorage.setItem("auth_token", token);
+      }
+
+      if (refreshToken) {
+        await AsyncStorage.setItem("refresh_token", refreshToken);
       }
 
       Toast.show({
@@ -208,17 +236,17 @@ const { mutateAsync: registerUser, isPending: registerLoading } = useRegisterUse
 
           {action !== "forgotPassword" && (
             <TextInput
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-            mode="outlined"
-            right={
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              mode="outlined"
+              right={
                 <TextInput.Icon
-                icon={showPassword ? "eye-off" : "eye"}
-                onPress={() => setShowPassword(!showPassword)}
+                  icon={showPassword ? "eye-off" : "eye"}
+                  onPress={() => setShowPassword(!showPassword)}
                 />
-            }
+              }
             />
           )}
 
@@ -246,16 +274,16 @@ const { mutateAsync: registerUser, isPending: registerLoading } = useRegisterUse
             </TouchableOpacity>
           </View>
 
-            <Button
+          <Button
             mode="contained"
             onPress={handleSubmit}
             disabled={isFormInvalid || loginLoading || registerLoading}
             loading={loginLoading || registerLoading}
             style={{ marginTop: 8 }}
             buttonColor={theme.colors.primary}
-            >
+          >
             {primaryButtonLabel}
-            </Button>
+          </Button>
 
           <View className="mt-5 flex-row justify-center">
             <Text className="text-gray-500">
