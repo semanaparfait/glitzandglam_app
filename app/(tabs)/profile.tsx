@@ -18,7 +18,12 @@ export default function Profile() {
     try {
       await logout();
       queryClient.setQueryData(["userProfile"], null);
+      queryClient.setQueryData(["cart"], {
+        items: [],
+        totalPriceFormatted: "0 Frw",
+      });
       await queryClient.removeQueries({ queryKey: ["userProfile"] });
+      await queryClient.removeQueries({ queryKey: ["cart"] });
 
       Toast.show({ type: "success", text1: "Logged out successfully" });
       router.replace("/");
@@ -40,7 +45,7 @@ export default function Profile() {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       <Header title="Profile" showBackButton />
-      <ScrollView className="px-4 items-center justify-center">
+      <ScrollView className="px-4  justify-center">
         {!currentUser ? (
           <>
             <View className="flex-col items-center justify-center gap-3 ">
@@ -91,7 +96,7 @@ export default function Profile() {
         ) : (
           <>
             <View className="flex-col items-center justify-center gap-3 mt-10 w-full">
-          <View className="items-center">
+              <View className="items-center">
                 {currentUser.profile ? (
                   <Image
                     source={{ uri: currentUser.profile }}
@@ -104,12 +109,12 @@ export default function Profile() {
                       width: 100,
                       height: 100,
                       borderRadius: 50,
-                      backgroundColor: '#907764',
-                      justifyContent: 'center',
-                      alignItems: 'center',
+                      backgroundColor: "#907764",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    <Text style={{ fontSize: 40, color: '#fff' }}>
+                    <Text style={{ fontSize: 40, color: "#fff" }}>
                       {currentUser.email.charAt(0).toUpperCase()}
                     </Text>
                   </View>
