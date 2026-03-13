@@ -40,7 +40,7 @@ export default function Profile() {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       <Header title="Profile" showBackButton />
-      <ScrollView className="px-4">
+      <ScrollView className="px-4 items-center justify-center">
         {!currentUser ? (
           <>
             <View className="flex-col items-center justify-center gap-3 ">
