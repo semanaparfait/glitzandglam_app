@@ -90,16 +90,19 @@ function SelectField({
 export default function Addresses() {
   const [addressForm, setAddressForm] = useState<boolean>(false);
   const [openField, setOpenField] = useState<FieldKey | null>(null);
-  const [recipientName, setRecipientName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [additionalDetails, setAdditionalDetails] = useState("");
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedSector, setSelectedSector] = useState("");
-  const [selectedCell, setSelectedCell] = useState("");
-  const [selectedVillage, setSelectedVillage] = useState("");
-  const [isDefaultAddress, setIsDefaultAddress] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const [formData, setFormData] = useState({
+    recipientName: "",
+    phoneNumber: "",
+    additionalDetails: "",
+    province: "",
+    district: "",
+    sector: "",
+    cell: "",
+    village: "",
+    isDefaultAddress: false,
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -110,7 +113,7 @@ export default function Addresses() {
         const loggedIn = typeof token === "string" && token.length > 0;
         setIsLoggedIn(loggedIn);
         if (!loggedIn) {
-          setIsDefaultAddress(false);
+          setFormData((prev) => ({ ...prev, isDefaultAddress: false }));
         }
       }
     };
@@ -125,79 +128,80 @@ export default function Addresses() {
   const provinces: string[] = Provinces();
 
   const districts: string[] = useMemo(() => {
-    if (!selectedProvince) return [];
-    return Districts({ provinces: selectedProvince as any }) ?? [];
-  }, [selectedProvince]);
+    if (!formData.province) return [];
+    return Districts({ provinces: formData.province as any }) ?? [];
+  }, [formData.province]);
 
   const sectors: string[] = useMemo(() => {
-    if (!selectedProvince || !selectedDistrict) return [];
+    if (!formData.province || !formData.district) return [];
 
     const candidateSectors =
       Sectors({
-        province: selectedProvince as any,
-        district: selectedDistrict as any,
+        province: formData.province as any,
+        district: formData.district as any,
       }) ?? [];
 
-    // Filter out sectors not linked to the selected district.
     return candidateSectors.filter((sector: any) => {
       const linkedCells =
         Cells({
-          province: selectedProvince as any,
-          district: selectedDistrict as any,
+          province: formData.province as any,
+          district: formData.district as any,
           sector,
         }) ?? [];
       return linkedCells.length > 0;
     });
-  }, [selectedProvince, selectedDistrict]);
+  }, [formData.province, formData.district]);
 
   const cells: string[] = useMemo(() => {
-    if (!selectedProvince || !selectedDistrict || !selectedSector) return [];
+    if (!formData.province || !formData.district || !formData.sector) return [];
     return (
       Cells({
-        province: selectedProvince as any,
-        district: selectedDistrict as any,
-        sector: selectedSector as any,
+        province: formData.province as any,
+        district: formData.district as any,
+        sector: formData.sector as any,
       }) ?? []
     );
-  }, [selectedProvince, selectedDistrict, selectedSector]);
+  }, [formData.province, formData.district, formData.sector]);
 
   const villages: string[] = useMemo(() => {
     if (
-      !selectedProvince ||
-      !selectedDistrict ||
-      !selectedSector ||
-      !selectedCell
+      !formData.province ||
+      !formData.district ||
+      !formData.sector ||
+      !formData.cell
     )
       return [];
     return (
       Villages({
-        province: selectedProvince as any,
-        district: selectedDistrict as any,
-        sector: selectedSector as any,
-        cell: selectedCell as any,
+        province: formData.province as any,
+        district: formData.district as any,
+        sector: formData.sector as any,
+        cell: formData.cell as any,
       }) ?? []
     );
-  }, [selectedProvince, selectedDistrict, selectedSector, selectedCell]);
+  }, [formData.province, formData.district, formData.sector, formData.cell]);
 
   const isFormValid =
-    recipientName.trim().length > 0 &&
-    phoneNumber.trim().length > 0 &&
-    selectedProvince.length > 0 &&
-    selectedDistrict.length > 0 &&
-    selectedSector.length > 0 &&
-    selectedCell.length > 0 &&
-    selectedVillage.length > 0;
+    formData.recipientName.trim().length > 0 &&
+    formData.phoneNumber.trim().length > 0 &&
+    formData.province.length > 0 &&
+    formData.district.length > 0 &&
+    formData.sector.length > 0 &&
+    formData.cell.length > 0 &&
+    formData.village.length > 0;
 
   const resetForm = () => {
-    setRecipientName("");
-    setPhoneNumber("");
-    setAdditionalDetails("");
-    setSelectedProvince("");
-    setSelectedDistrict("");
-    setSelectedSector("");
-    setSelectedCell("");
-    setSelectedVillage("");
-    setIsDefaultAddress(false);
+    setFormData({
+      recipientName: "",
+      phoneNumber: "",
+      additionalDetails: "",
+      province: "",
+      district: "",
+      sector: "",
+      cell: "",
+      village: "",
+      isDefaultAddress: false,
+    });
     setOpenField(null);
     setAddressForm(false);
   };
@@ -244,83 +248,99 @@ export default function Addresses() {
             <SelectField
               fieldKey="province"
               label="Province"
-              value={selectedProvince}
+              value={formData.province}
               placeholder="Choose province"
               options={provinces}
               openField={openField}
               setOpenField={setOpenField}
               onSelect={(value) => {
-                setSelectedProvince(value);
-                setSelectedDistrict("");
-                setSelectedSector("");
-                setSelectedCell("");
-                setSelectedVillage("");
+                setFormData((prev) => ({
+                  ...prev,
+                  province: value,
+                  district: "",
+                  sector: "",
+                  cell: "",
+                  village: "",
+                }));
               }}
             />
 
             <SelectField
               fieldKey="district"
               label="District"
-              value={selectedDistrict}
+              value={formData.district}
               placeholder="Choose district"
               options={districts}
-              disabled={!selectedProvince}
+              disabled={!formData.province}
               openField={openField}
               setOpenField={setOpenField}
               onSelect={(value) => {
-                setSelectedDistrict(value);
-                setSelectedSector("");
-                setSelectedCell("");
-                setSelectedVillage("");
+                setFormData((prev) => ({
+                  ...prev,
+                  district: value,
+                  sector: "",
+                  cell: "",
+                  village: "",
+                }));
               }}
             />
 
             <SelectField
               fieldKey="sector"
               label="Sector"
-              value={selectedSector}
+              value={formData.sector}
               placeholder="Choose sector"
               options={sectors}
-              disabled={!selectedDistrict}
+              disabled={!formData.district}
               openField={openField}
               setOpenField={setOpenField}
               onSelect={(value) => {
-                setSelectedSector(value);
-                setSelectedCell("");
-                setSelectedVillage("");
+                setFormData((prev) => ({
+                  ...prev,
+                  sector: value,
+                  cell: "",
+                  village: "",
+                }));
               }}
             />
 
             <SelectField
               fieldKey="cell"
               label="Cell"
-              value={selectedCell}
+              value={formData.cell}
               placeholder="Choose cell"
               options={cells}
-              disabled={!selectedSector}
+              disabled={!formData.sector}
               openField={openField}
               setOpenField={setOpenField}
               onSelect={(value) => {
-                setSelectedCell(value);
-                setSelectedVillage("");
+                setFormData((prev) => ({
+                  ...prev,
+                  cell: value,
+                  village: "",
+                }));
               }}
             />
 
             <SelectField
               fieldKey="village"
               label="Village"
-              value={selectedVillage}
+              value={formData.village}
               placeholder="Choose village"
               options={villages}
-              disabled={!selectedCell}
+              disabled={!formData.cell}
               openField={openField}
               setOpenField={setOpenField}
-              onSelect={setSelectedVillage}
+              onSelect={(value) =>
+                setFormData((prev) => ({ ...prev, village: value }))
+              }
             />
             <Text className="mb-2">Additional Note</Text>
             <TextInput
-              value={additionalDetails}
-              onChangeText={setAdditionalDetails}
+              value={formData.additionalDetails}
+              onChangeText={(v) =>
+                setFormData((prev) => ({ ...prev, additionalDetails: v }))
+              }
               multiline
               numberOfLines={5}
               className="mb-4 border rounded-xl border-gray-300 bg-white px-4 py-3 text-gray-900"
@@ -329,14 +349,21 @@ export default function Addresses() {
 
             {isLoggedIn && (
               <TouchableOpacity
-                onPress={() => setIsDefaultAddress((prev) => !prev)}
+                onPress={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    isDefaultAddress: !prev.isDefaultAddress,
+                  }))
+                }
                 className="flex-row items-center mb-4"
                 activeOpacity={0.8}
               >
                 <Ionicons
-                  name={isDefaultAddress ? "checkbox" : "square-outline"}
+                  name={
+                    formData.isDefaultAddress ? "checkbox" : "square-outline"
+                  }
                   size={22}
-                  color={isDefaultAddress ? "#907764" : "#6b7280"}
+                  color={formData.isDefaultAddress ? "#907764" : "#6b7280"}
                 />
                 <Text className="ml-2 text-gray-700 font-medium">
                   Make this my default address
@@ -345,7 +372,7 @@ export default function Addresses() {
             )}
             <TouchableOpacity className="bg-primary items-center py-3 rounded-full">
               <Text className="font-semibold text-base">Continue</Text>
-              </TouchableOpacity>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
