@@ -190,7 +190,7 @@ export default function Cart() {
           <View className="w-24 h-24 bg-gray-50 rounded-full items-center justify-center mb-8">
             <Ionicons name="bag" size={42} color="#907764" strokeWidth={1.2} />
           </View>
-          <Text className="text-2xl font-serif text- tracking-tight">
+          <Text className="text-2xl font-serif text-gray-500 tracking-tight">
             Your Bag is Empty
           </Text>
           <Text className="text-center text-gray-500 mt-3 leading-6 font-light">

@@ -38,7 +38,7 @@ export default function Profile() {
   // console.log("User Profile:", currentUser);
   const PROFILE_MENU = [
     { id: 1, title: "My Order", icon: "book", route: "/orders" },
-    { id: 2, title: "Shipping Addreses", icon: "location", route: "address" },
+    { id: 2, title: "Shipping Addresses", icon: "location", route: "address" },
     { id: 3, title: "My review", icon: "star", route: "/reviews" },
     { id: 4, title: "Settings", icon: "settings", route: "/settings" },
   ];
