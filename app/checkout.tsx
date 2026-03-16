@@ -2,8 +2,9 @@ import Header from "@/components/header";
 import { useAddresses } from "@/hooks/addresses/useAddress";
 import { useCartItems } from "@/hooks/cart/useCart";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -12,13 +13,24 @@ export default function Checkout() {
     "cash" | "phoneNumber"
   >("phoneNumber");
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const {
     data: addresses,
     isLoading: isAddressesLoading,
     error: addressesError,
-  } = useAddresses();
+  } = useAddresses(token);
   const router = useRouter();
   const { data: cartItems, isLoading, error } = useCartItems();
+
+  useEffect(() => {
+    const loadToken = async () => {
+      const storedToken = await AsyncStorage.getItem("auth_token");
+      setToken(storedToken);
+    };
+
+    loadToken();
+  }, []);
+
   const subtotal = useMemo(
     () =>
       cartItems?.items?.reduce(
