@@ -5,13 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View ,TextInput} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Checkout() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
     "cash" | "phoneNumber"
   >("phoneNumber");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const {
@@ -149,7 +150,7 @@ export default function Checkout() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setSelectedPaymentMethod("cash")}
-            className={`bg-white p-4 rounded-xl mb-4 shadow-sm  flex-row items-center  border-2${
+            className={`bg-white hidden p-4 rounded-xl mb-4 shadow-sm  flex-row items-center  border-2${
               selectedPaymentMethod === "cash"
                 ? "border-primary "
                 : "border-transparent "
@@ -166,6 +167,16 @@ export default function Checkout() {
               <Ionicons name="checkmark-circle" size={24} color="#907764" />
             )}
           </TouchableOpacity>
+          {/* ----------input for phone number to pay with----- */}
+          <View>
+            <Text className="font-bold text-lg mb-3">Phone Number</Text>
+            <TextInput
+              placeholder="+250 788 123 456"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              className="bg-white p-4 rounded-xl mb-4 shadow-sm border-2 border-gray-300 focus:border-primary"
+            />
+          </View>
         </View>
       </ScrollView>
       {/* ---------summary----------- */}
